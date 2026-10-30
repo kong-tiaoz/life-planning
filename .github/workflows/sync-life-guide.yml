@@ -1,0 +1,59 @@
+name: 每周检查人生指南更新
+
+"on":
+  schedule:
+    # Monday 09:17 Asia/Shanghai = Monday 01:17 UTC.
+    - cron: '17 1 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weekly-life-guide-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'kong-tiaoz/life-planning' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: 读取人生规划仓库
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: 验证同步的文件保护与无变化行为
+        run: python3 -B -m unittest discover -s tests -v
+
+      - name: 检查上游并准备更新
+        id: sync
+        run: python3 -B scripts/sync_guide.py --body-file "$RUNNER_TEMP/guide-sync-pr.md"
+
+      - name: 创建或更新同一条提案
+        if: steps.sync.outputs.changed == 'true'
+        id: proposal
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: automation/update-how-to-live-better
+          base: main
+          add-paths: |
+            guides/how-to-live-better/
+            sync/how-to-live-better.json
+            UPSTREAM.md
+          commit-message: 'docs: sync HowToLiveBetter to ${{ steps.sync.outputs.upstream_short }}'
+          author: 'github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
+          title: '更新《高性价比人生指南》至 ${{ steps.sync.outputs.upstream_short }}'
+          body-path: ${{ runner.temp }}/guide-sync-pr.md
+
+      - name: 记录提案链接
+        if: steps.proposal.outputs.pull-request-url != ''
+        env:
+          PROPOSAL_URL: ${{ steps.proposal.outputs.pull-request-url }}
+        run: printf '\n更新提案：%s\n' "$PROPOSAL_URL" >> "$GITHUB_STEP_SUMMARY"
