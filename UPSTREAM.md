@@ -3,11 +3,11 @@
 ## 当前同步版本
 
 <!-- guide-sync:start -->
-- 当前同步提交：`e2605d3e2242bd6216c9255192b8a8957a08c55a`
-- 固定版本：https://github.com/eternity4719/HowToLiveBetter/tree/e2605d3e2242bd6216c9255192b8a8957a08c55a
-- 最新同步日期：2026-10-30（Asia/Shanghai）
-- 文件数：331
-- 目录 Git tree SHA：`f642051daaa3a84b963edf19ea34205c7441fddd`
+- 当前同步提交：`36c78569a8d21f26c7c650d2993c7103832ca4b5`
+- 固定版本：https://github.com/eternity4719/HowToLiveBetter/tree/36c78569a8d21f26c7c650d2993c7103832ca4b5
+- 最新同步日期：2026-11-16（Asia/Shanghai）
+- 文件数：338
+- 目录 Git tree SHA：`c2b63ff52bafc099da90a3341efe15fb043ac979`
 <!-- guide-sync:end -->
 
 ## 首次导入记录
